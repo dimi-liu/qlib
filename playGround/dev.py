@@ -1,17 +1,26 @@
-import hashlib
+import pandas as pd
+from Crypto.Hash import SM3Hash
 
-if __name__ == '__main__':
-    with open('key') as f: file = f.read()
-    l = file.split()
-    cache = ''
-    for i in l:
-        print(i)
-        print(hashlib.md5(i.encode(encoding='utf-8')).hexdigest())
-        print('')
-        cache += i
-    print(cache)
-    print(hashlib.md5(cache.encode(encoding='utf-8')).hexdigest())
+# 读取 CSV 文件
+df = pd.read_csv('data.csv')
 
+# 待加密数据所在的列
+column_name = 'column_name'
+
+# 对每个数据进行加密
+for i, value in enumerate(df[column_name]):
+    # 将数据转换为字节数组
+    data = bytes(str(value), 'utf-8')
+
+    # 计算 SM3 哈希值
+    hash_object = SM3Hash.new(data)
+    sm3_hash = hash_object.digest().hex()
+
+    # 将加密后的值写回到 DataFrame 中
+    df.at[i, column_name] = sm3_hash
+
+# 输出加密后的 DataFrame
+print(df)
 # import qlib
 # from pathlib import Path
 # # region in [REG_CN, REG_US]
